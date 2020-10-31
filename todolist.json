@@ -1,0 +1,17 @@
+[
+    {
+        "id": 1,
+        "task": "Practice Vanilla JS",
+        "status": "completed"
+    },
+    {
+        "id": 2,
+        "task": "JS games",
+        "status": "ongoing"
+    },
+    {
+        "id": 3,
+        "task": "NodeJS Basics",
+        "status": "pending"
+    }
+]

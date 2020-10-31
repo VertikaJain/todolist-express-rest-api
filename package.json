@@ -1,0 +1,27 @@
+{
+  "name": "todolist-express-rest-api",
+  "version": "1.0.0",
+  "description": "REST APIs of TodoList using Express",
+  "main": "index.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/VertikaJain/todolist-express-rest-api.git"
+  },
+  "author": "Vertika Jain",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/VertikaJain/todolist-express-rest-api/issues"
+  },
+  "homepage": "https://github.com/VertikaJain/todolist-express-rest-api#readme",
+  "dependencies": {
+    "express": "^4.17.1",
+    "uuid": "^8.3.1"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.6"
+  }
+}
