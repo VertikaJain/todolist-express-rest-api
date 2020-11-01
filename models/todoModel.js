@@ -14,9 +14,19 @@ function addTodoData(newTask) {
     })
 }
 
+// Update task based on given ID
+function updateTodoData(newTask) {
+    return new Promise((resolve, reject) => {
+        let index = todoList.findIndex(t => t.id == newTask.id)
+        todoList[index] = newTask
+        writeToFile(todoList)
+        resolve(todoList)
+    })
+}
+
 // Write Utility to Update File
 function writeToFile(todoList) {
     fs.writeFileSync("todolist.json", JSON.stringify(todoList))
 }
 
-module.exports = { getTodoData, addTodoData }
+module.exports = { getTodoData, addTodoData, updateTodoData }
