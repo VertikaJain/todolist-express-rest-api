@@ -33,9 +33,18 @@ function removeTodoData(id) {
     })
 }
 
+// Delete task based on given ID
+function removeTodoByStatusData(status) {
+    return new Promise((resolve, reject) => {
+        todoList = todoList.filter(t => t.status != status)
+        writeToFile(todoList)
+        resolve(todoList)
+    })
+}
+
 // Write Utility to Update File
 function writeToFile(todoList) {
     fs.writeFileSync("todolist.json", JSON.stringify(todoList))
 }
 
-module.exports = { getTodoData, addTodoData, updateTodoData, removeTodoData }
+module.exports = { getTodoData, addTodoData, updateTodoData, removeTodoData, removeTodoByStatusData }

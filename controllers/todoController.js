@@ -1,4 +1,4 @@
-const { getTodoData, addTodoData, updateTodoData, removeTodoData } = require("../models/todoModel")
+const { getTodoData, addTodoData, updateTodoData, removeTodoData, removeTodoByStatusData } = require("../models/todoModel")
 const { v4: uuidv4 } = require("uuid")
 
 // GET all todos
@@ -15,6 +15,15 @@ async function getTodoByID(id) {
     let task = todoList.find(t => t.id == id)
     if (!task) return { error: "Data not found" }
     return { task }
+}
+
+// GET task by Status
+async function getTodoByStatus(status) {
+    let todoList = await getTodoData()
+    if (!todoList) return { error: "Data not found" }
+    todoList = todoList.filter(t => t.status == status)
+    if (todoList.length < 1) return { error: "Data not found" }
+    return { todoList }
 }
 
 // Add new Task
@@ -45,7 +54,7 @@ async function updateTodo(id, newTask) {
     return { updatedTodoList }
 }
 
-// Delete a task
+// Delete a task by ID
 async function removeTodo(id) {
     // Search
     let getTodoByIDResult = await getTodoByID(id)
@@ -57,4 +66,16 @@ async function removeTodo(id) {
     return { todoList }
 }
 
-module.exports = { getTodos, getTodoByID, addNewTodo, updateTodo, removeTodo }
+// Delete a task by Status
+async function removeTodoByStatus(status) {
+    // Search
+    let getTodoByIDResult = await getTodoByStatus(status)
+    if (getTodoByIDResult.error) return getTodoByIDResult
+
+    // Delete
+    let todoList = await removeTodoByStatusData(status)
+    if (!todoList) return ({ error: "Cannot Remove Data." }, { status: 500 })
+    return { todoList }
+}
+
+module.exports = { getTodos, getTodoByID, getTodoByStatus, addNewTodo, updateTodo, removeTodo, removeTodoByStatus }

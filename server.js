@@ -2,7 +2,7 @@ const express = require("express")
 const app = express()
 const PORT = process.env.PORT || 5000
 
-const { getTodos, getTodoByID, addNewTodo, updateTodo, removeTodo } = require("./controllers/todoController")
+const { getTodos, getTodoByID, addNewTodo, updateTodo, removeTodo, getTodoByStatus, removeTodoByStatus } = require("./controllers/todoController")
 
 app.use(express.json())
 
@@ -20,6 +20,14 @@ app.get("/todos/:id", async (req, res) => {
     if (getTodoByIDResult.error)
         return res.status(404).send(getTodoByIDResult)
     res.send(getTodoByIDResult)
+})
+
+// GET task by Status
+app.get("/todos/status/:status", async (req, res) => {
+    let getTodoByStatusResult = await getTodoByStatus(req.params.status)
+    if (getTodoByStatusResult.error)
+        return res.status(404).send(getTodoByStatusResult)
+    res.send(getTodoByStatusResult.todoList)
 })
 
 // Add new todo
@@ -51,6 +59,16 @@ app.put("/todos/:id", async (req, res) => {
 // Delete Tasks by ID
 app.delete("/todos/:id", async (req, res) => {
     let removeTodoResult = await removeTodo(req.params.id)
+    if (removeTodoResult.error && removeTodoResult.status == 500)
+        return res.status(500).send(removeTodoResult)
+    if (removeTodoResult.error)
+        return res.status(404).send(removeTodoResult)
+    res.send(removeTodoResult)
+})
+
+// Delete Tasks by Status
+app.delete("/todos/status/:status", async (req, res) => {
+    let removeTodoResult = await removeTodoByStatus(req.params.status)
     if (removeTodoResult.error && removeTodoResult.status == 500)
         return res.status(500).send(removeTodoResult)
     if (removeTodoResult.error)
