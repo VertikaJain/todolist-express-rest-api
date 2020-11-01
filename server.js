@@ -2,7 +2,7 @@ const express = require("express")
 const app = express()
 const PORT = process.env.PORT || 5000
 
-const { getTodos, getTodoByID, addNewTodo, updateTodo } = require("./controllers/todoController")
+const { getTodos, getTodoByID, addNewTodo, updateTodo, removeTodo } = require("./controllers/todoController")
 
 app.use(express.json())
 
@@ -46,6 +46,16 @@ app.put("/todos/:id", async (req, res) => {
     if (updatedTodoResult.error)
         return res.status(404).send(updatedTodoResult)
     res.status(200).send(updatedTodoResult)
+})
+
+// Delete Tasks by ID
+app.delete("/todos/:id", async (req, res) => {
+    let removeTodoResult = await removeTodo(req.params.id)
+    if (removeTodoResult.error && removeTodoResult.status == 500)
+        return res.status(500).send(removeTodoResult)
+    if (removeTodoResult.error)
+        return res.status(404).send(removeTodoResult)
+    res.send(removeTodoResult)
 })
 
 app.listen(PORT, () => console.log(`Server Connected to ${PORT}`))

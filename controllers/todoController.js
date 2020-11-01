@@ -1,4 +1,4 @@
-const { getTodoData, addTodoData, updateTodoData } = require("../models/todoModel")
+const { getTodoData, addTodoData, updateTodoData, removeTodoData } = require("../models/todoModel")
 const { v4: uuidv4 } = require("uuid")
 
 // GET all todos
@@ -45,4 +45,16 @@ async function updateTodo(id, newTask) {
     return { updatedTodoList }
 }
 
-module.exports = { getTodos, getTodoByID, addNewTodo, updateTodo }
+// Delete a task
+async function removeTodo(id) {
+    // Search
+    let getTodoByIDResult = await getTodoByID(id)
+    if (getTodoByIDResult.error) return getTodoByIDResult
+
+    // Delete
+    let todoList = await removeTodoData(id)
+    if (!todoList) return ({ error: "Cannot Remove Data." }, { status: 500 })
+    return { todoList }
+}
+
+module.exports = { getTodos, getTodoByID, addNewTodo, updateTodo, removeTodo }

@@ -1,4 +1,4 @@
-const todoList = require("../todolist.json")
+let todoList = require("../todolist.json")
 const fs = require("fs");
 
 // GET all todos
@@ -24,9 +24,18 @@ function updateTodoData(newTask) {
     })
 }
 
+// Delete task based on given ID
+function removeTodoData(id) {
+    return new Promise((resolve, reject) => {
+        todoList = todoList.filter(t => t.id != id)
+        writeToFile(todoList)
+        resolve(todoList)
+    })
+}
+
 // Write Utility to Update File
 function writeToFile(todoList) {
     fs.writeFileSync("todolist.json", JSON.stringify(todoList))
 }
 
-module.exports = { getTodoData, addTodoData, updateTodoData }
+module.exports = { getTodoData, addTodoData, updateTodoData, removeTodoData }
