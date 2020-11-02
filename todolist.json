@@ -1,1 +1,31 @@
-[{"id":1,"task":"Practice Vanilla JS","status":"completed"},{"id":2,"task":"JS games","status":"ongoing"},{"id":3,"task":"NodeJS Basics","status":"pending"},{"id":"eb0f05d5-6b58-468e-923f-1e2a3276004f","task":"new task","status":"pending"}]
+{
+    "tl1": [
+        {
+            "id": 1,
+            "task": "Practice Vanilla JS",
+            "status": "completed"
+        },
+        {
+            "id": 2,
+            "task": "JS games",
+            "status": "pending"
+        }
+    ],
+    "tl2": [
+        {
+            "id": 1,
+            "task": "NodeJS",
+            "status": "ongoing"
+        },
+        {
+            "id": 2,
+            "task": "ReactJS",
+            "status": "pending"
+        },
+        {
+            "id": 3,
+            "task": "mongoDB",
+            "status": "completed"
+        }
+    ]
+}

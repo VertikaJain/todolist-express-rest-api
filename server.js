@@ -2,28 +2,28 @@ const express = require("express")
 const app = express()
 const PORT = process.env.PORT || 5000
 
-const { getTodos, getTodoByID, addNewTodo, updateTodo, removeTodo, getTodoByStatus, removeTodoByStatus } = require("./controllers/todoController")
+// const { getTodos, getTodoByID, addNewTodo, updateTodo, removeTodo, getTodoByStatus, removeTodoByStatus } = require("./controllers/todoController")
+const todoController = require("./controllers/todoController")
 
 app.use(express.json())
 
-// GET all todos
-app.get("/todos", async (req, res) => {
-    if (req.query.status) {
-        // GET task by Status
-        let getTodoByStatusResult = await getTodoByStatus(req.query.status)
-        if (getTodoByStatusResult.error)
-            return res.status(404).send(getTodoByStatusResult)
-        return res.send(getTodoByStatusResult.todoList)
-    }
-    // Getting all tasks
-    let getTodoResult = await getTodos()
-    if (getTodoResult.error)
-        return res.status(404).send(getTodoResult)
-    res.send(getTodoResult)
+// GET All Todo Lists
+app.get("/lists", (req, res) => {
+    todoController.getTodoLists(req, res)
+})
+// GET Todo List by ID
+app.get("/lists/:tlid",  (req, res) => {
+    todoController.getTodoListByID(req, res)
 })
 
+// GET Task based on ID
+app.get("/lists/:tlid/todos/:tdid",  (req, res) => {
+    todoController.getTaskByID(req, res)
+})
+
+
 // GET task by ID
-app.get("/todos/:id", async (req, res) => {
+/* app.get("/todos/:id", async (req, res) => {
     let getTodoByIDResult = await getTodoByID(req.params.id)
     if (getTodoByIDResult.error)
         return res.status(404).send(getTodoByIDResult)
@@ -74,6 +74,6 @@ app.delete("/todos", async (req, res) => {
     if (removeTodoResult.error)
         return res.status(404).send(removeTodoResult)
     res.send(removeTodoResult)
-})
+}) */
 
 app.listen(PORT, () => console.log(`Server Connected to ${PORT}`))

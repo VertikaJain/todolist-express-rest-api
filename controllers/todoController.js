@@ -1,21 +1,43 @@
-const { getTodoData, addTodoData, updateTodoData, removeTodoData, removeTodoByStatusData } = require("../models/todoModel")
-const { v4: uuidv4 } = require("uuid")
+// const { getTodoListData, addTodoData, updateTodoData, removeTodoData, removeTodoByStatusData } = require("../models/todoModel")
+const todoModel = require("../models/todoModel")
+const { v4: uuidv4 } = require("uuid");
+const { json } = require("express");
 
-// GET all todos
-async function getTodos() {
-    let todoList = await getTodoData()
-    if (!todoList) return { error: "Data not found" }
-    return { todoList }
+// GET all Todo Lists
+async function getTodoLists(req, res) {
+    let todoLists = await todoModel.getTodoListData()
+    if (!todoLists) return res.status(404).send({ error: "Data Not Found" })
+    return res.status(200).send(todoLists)
 }
 
-// GET task by ID
-async function getTodoByID(id) {
-    let todoList = await getTodoData()
-    if (!todoList) return { error: "Data not found" }
-    let task = todoList.find(t => t.id == id)
-    if (!task) return { error: "Data not found" }
-    return { task }
+// GET Todo List by ID
+async function getTodoListByID(req, res) {
+    const tlid = req.params.tlid
+    let todoLists = await todoModel.getTodoListData()
+    if (!todoLists) return res.status(404).send({ error: "Data Not Found" })
+    let todoList = ""
+    for (const [key, value] of Object.entries(todoLists)) {
+        if (tlid == key) todoList = value
+    }
+    if (!todoList) return res.status(404).send({ error: "Data Not Found" })
+    return res.status(200).send(todoList)
 }
+
+// GET Task by ID
+async function getTaskByID(req, res) {
+    const { tlid, tdid } = req.params
+    let todoLists = await todoModel.getTodoListData()
+    if (!todoLists) return res.status(404).send({ error: "Data Not Found" })
+    let task = ""
+    for (const [key, value] of Object.entries(todoLists)) {
+        if (tlid == key) {
+            task = value.find(t => t.id == tdid)
+        }
+    }
+    if (!task) return res.status(404).send({ error: "Data Not Found" })
+    return res.status(200).send(task)
+}
+
 
 // GET task by Status
 async function getTodoByStatus(status) {
@@ -78,4 +100,8 @@ async function removeTodoByStatus(status) {
     return { todoList }
 }
 
-module.exports = { getTodos, getTodoByID, getTodoByStatus, addNewTodo, updateTodo, removeTodo, removeTodoByStatus }
+module.exports = {
+    getTodoLists, getTodoListByID,
+    getTaskByID,
+    getTodoByStatus, addNewTodo, updateTodo, removeTodo, removeTodoByStatus
+}
