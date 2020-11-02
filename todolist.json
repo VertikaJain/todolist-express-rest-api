@@ -9,6 +9,11 @@
             "id": 2,
             "task": "JS games",
             "status": "pending"
+        },
+        {
+            "id": 3,
+            "task": "JS callbacks",
+            "status": "pending"
         }
     ],
     "tl2": [

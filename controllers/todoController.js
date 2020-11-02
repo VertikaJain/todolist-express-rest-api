@@ -7,6 +7,20 @@ const { json } = require("express");
 async function getTodoLists(req, res) {
     let todoLists = await todoModel.getTodoListData()
     if (!todoLists) return res.status(404).send({ error: "Data Not Found" })
+
+    // GET data by Status
+    if (req.query.status) {
+        let dataByStatus = []
+        for (const values of Object.values(todoLists)) {
+            let data = values.filter(v => v.status == req.query.status)
+            if (data.length > 0) {
+                for (let d of data) dataByStatus.push(d)
+            }
+        }
+        if (dataByStatus.length < 1) return res.status(404).send({ error: "Data Not Found" })
+        return res.status(200).send(dataByStatus)
+    }
+
     return res.status(200).send(todoLists)
 }
 
@@ -19,7 +33,11 @@ async function getTodoListByID(req, res) {
     for (const [key, value] of Object.entries(todoLists)) {
         if (tlid == key) todoList = value
     }
-    if (!todoList) return res.status(404).send({ error: "Data Not Found" })
+    // GET data by Status
+    if (req.query.status) {
+        todoList = todoList.filter(t => t.status == req.query.status)
+    }
+    if (todoList.length < 1) return res.status(404).send({ error: "Data Not Found" })
     return res.status(200).send(todoList)
 }
 
@@ -31,21 +49,14 @@ async function getTaskByID(req, res) {
     let task = ""
     for (const [key, value] of Object.entries(todoLists)) {
         if (tlid == key) {
-            task = value.find(t => t.id == tdid)
+            if (req.query.status) // GET data by Status
+                task = value.find(t => (t.id == tdid && t.status == req.query.status))
+            else
+                task = value.find(t => t.id == tdid)
         }
     }
     if (!task) return res.status(404).send({ error: "Data Not Found" })
     return res.status(200).send(task)
-}
-
-
-// GET task by Status
-async function getTodoByStatus(status) {
-    let todoList = await getTodoData()
-    if (!todoList) return { error: "Data not found" }
-    todoList = todoList.filter(t => t.status == status)
-    if (todoList.length < 1) return { error: "Data not found" }
-    return { todoList }
 }
 
 // Add new Task
@@ -103,5 +114,6 @@ async function removeTodoByStatus(status) {
 module.exports = {
     getTodoLists, getTodoListByID,
     getTaskByID,
-    getTodoByStatus, addNewTodo, updateTodo, removeTodo, removeTodoByStatus
+    // getTodoByStatus,
+    addNewTodo, updateTodo, removeTodo, removeTodoByStatus
 }
