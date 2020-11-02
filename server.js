@@ -8,6 +8,14 @@ app.use(express.json())
 
 // GET all todos
 app.get("/todos", async (req, res) => {
+    if (req.query.status) {
+        // GET task by Status
+        let getTodoByStatusResult = await getTodoByStatus(req.query.status)
+        if (getTodoByStatusResult.error)
+            return res.status(404).send(getTodoByStatusResult)
+        return res.send(getTodoByStatusResult.todoList)
+    }
+    // Getting all tasks
     let getTodoResult = await getTodos()
     if (getTodoResult.error)
         return res.status(404).send(getTodoResult)
@@ -20,14 +28,6 @@ app.get("/todos/:id", async (req, res) => {
     if (getTodoByIDResult.error)
         return res.status(404).send(getTodoByIDResult)
     res.send(getTodoByIDResult)
-})
-
-// GET task by Status
-app.get("/todos/status/:status", async (req, res) => {
-    let getTodoByStatusResult = await getTodoByStatus(req.params.status)
-    if (getTodoByStatusResult.error)
-        return res.status(404).send(getTodoByStatusResult)
-    res.send(getTodoByStatusResult.todoList)
 })
 
 // Add new todo
@@ -67,8 +67,8 @@ app.delete("/todos/:id", async (req, res) => {
 })
 
 // Delete Tasks by Status
-app.delete("/todos/status/:status", async (req, res) => {
-    let removeTodoResult = await removeTodoByStatus(req.params.status)
+app.delete("/todos", async (req, res) => {
+    let removeTodoResult = await removeTodoByStatus(req.query.status)
     if (removeTodoResult.error && removeTodoResult.status == 500)
         return res.status(500).send(removeTodoResult)
     if (removeTodoResult.error)
