@@ -1,7 +1,5 @@
-// const { getTodoListData, addTodoData, updateTodoData, removeTodoData, removeTodoByStatusData } = require("../models/todoModel")
 const todoModel = require("../models/todoModel")
 const { v4: uuidv4 } = require("uuid");
-const { json } = require("express");
 
 // GET all Todo Lists
 async function getTodoLists(req, res) {
@@ -26,13 +24,8 @@ async function getTodoLists(req, res) {
 
 // GET Todo List by ID
 async function getTodoListByID(req, res) {
-    const tlid = req.params.tlid
-    let todoLists = await todoModel.getTodoListData()
-    if (!todoLists) return res.status(404).send({ error: "Data Not Found" })
-    let todoList = ""
-    for (const [key, value] of Object.entries(todoLists)) {
-        if (tlid == key) todoList = value
-    }
+    let todoList = await todoModel.getTodoListByIdData(req.params.tlid)
+    if (!todoList) return res.status(404).send({ error: "Data Not Found" })
     // GET data by Status
     if (req.query.status) {
         todoList = todoList.filter(t => t.status == req.query.status)
@@ -44,28 +37,36 @@ async function getTodoListByID(req, res) {
 // GET Task by ID
 async function getTaskByID(req, res) {
     const { tlid, tdid } = req.params
-    let todoLists = await todoModel.getTodoListData()
-    if (!todoLists) return res.status(404).send({ error: "Data Not Found" })
-    let task = ""
-    for (const [key, value] of Object.entries(todoLists)) {
-        if (tlid == key) {
-            if (req.query.status) // GET data by Status
-                task = value.find(t => (t.id == tdid && t.status == req.query.status))
-            else
-                task = value.find(t => t.id == tdid)
-        }
-    }
+    let status = req.query.status || ""
+    let task = await todoModel.getTaskByIdData(tlid, tdid, status)
     if (!task) return res.status(404).send({ error: "Data Not Found" })
     return res.status(200).send(task)
 }
 
-// Add new Task
-async function addNewTodo(newTask) {
-    const id = uuidv4()
-    newTask = { id, ...newTask }
-    let todoList = await addTodoData(newTask)
-    if (!todoList) return { error: "Data not found" }
-    return { todoList }
+// Add New Todo List
+async function addTodoList(req, res) {
+    if (req.body.length < 1) return res.status(400).send({ error: "Invalid Request." })
+    let tempList = []
+    for (let todoList of req.body) {
+        if (!todoList.task || !todoList.status) return res.status(400).send({ error: "Invalid Request." })
+        const id = uuidv4()
+        let newTask = { id, ...todoList }
+        tempList.push(newTask)
+    }
+    let newTodoList = await todoModel.addTodoListData(tempList)
+    if (!newTodoList) return res.status(500).send({ error: "Cannot add Todo List." })
+    return res.status(201).send(newTodoList)
+}
+
+// Add new Task to the specified todolist
+async function addTask(req, res) {
+    // Validate inputs
+    if (!req.body.task || !req.body.status) return res.status(400).send({ error: "Invalid Request." })
+    let { task, status } = req.body
+    let newTask = { id: uuidv4(), task, status }
+    let newTodoList = await todoModel.addTodoData(req.params.tlid, newTask)
+    if (!newTodoList) return res.status(400).send({ error: "Cannot add Task. List does not exist." })
+    return res.status(201).send(newTodoList)
 }
 
 // Update a task
@@ -112,8 +113,7 @@ async function removeTodoByStatus(status) {
 }
 
 module.exports = {
-    getTodoLists, getTodoListByID,
-    getTaskByID,
-    // getTodoByStatus,
-    addNewTodo, updateTodo, removeTodo, removeTodoByStatus
+    getTodoLists, getTodoListByID, getTaskByID,
+    addTodoList, addTask,
+    updateTodo, removeTodo, removeTodoByStatus
 }

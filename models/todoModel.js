@@ -1,15 +1,52 @@
 let todoLists = require("../todolist.json")
 const fs = require("fs");
+const { v4: uuidv4 } = require("uuid");
 
-// GET all todos
+// GET all Todo Lists
 function getTodoListData() {
     return new Promise((resolve, reject) => resolve(todoLists))
 }
 
-// Add new Task
-function addTodoData(newTask) {
+// GET Todo List by ID
+function getTodoListByIdData(tlid) {
     return new Promise((resolve, reject) => {
-        todoLists.push(newTask)
+        if (!todoLists[tlid]) resolve()
+        resolve(todoLists[tlid])
+    })
+}
+
+// GET Task by ID
+function getTaskByIdData(tlid, tdid, status) {
+    return new Promise((resolve, reject) => {
+        if (!todoLists[tlid]) resolve()
+        let taskFound = ""
+        for (let task of todoLists[tlid]) {
+            if (status) {
+                if (task.id == tdid && task.status == status)
+                    taskFound = { ...task }
+            }
+            else if (task.id == tdid)
+                taskFound = { ...task }
+        }
+        if (!taskFound) resolve()
+        resolve(taskFound)
+    })
+}
+
+// Add new Todo List
+function addTodoListData(newTodoList) {
+    return new Promise((resolve, reject) => {
+        const id = uuidv4()
+        todoLists[id] = newTodoList
+        writeToFile(todoLists)
+        resolve(todoLists)
+    })
+}
+// Add new Task to the specified todolist
+function addTodoData(tlid, newTask) {
+    return new Promise((resolve, reject) => {
+        if (!todoLists[tlid]) resolve()
+        todoLists[tlid].push(newTask)
         writeToFile(todoLists)
         resolve(todoLists)
     })
@@ -48,6 +85,8 @@ function writeToFile(todoList) {
     fs.writeFileSync("todolist.json", JSON.stringify(todoList))
 }
 
-module.exports = { 
-    getTodoListData, addTodoData, updateTodoData, removeTodoData, removeTodoByStatusData 
+module.exports = {
+    getTodoListData, getTodoListByIdData, getTaskByIdData,
+    addTodoListData, addTodoData,
+    updateTodoData, removeTodoData, removeTodoByStatusData
 }
