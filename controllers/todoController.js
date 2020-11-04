@@ -65,27 +65,19 @@ async function addTask(req, res) {
     let { task, status } = req.body
     let newTask = { id: uuidv4(), task, status }
     let newTodoList = await todoModel.addTodoData(req.params.tlid, newTask)
-    if (!newTodoList) return res.status(400).send({ error: "Cannot add Task. List does not exist." })
+    if (!newTodoList) return res.status(404).send({ error: "Cannot add Task. Data does not exist." })
     return res.status(201).send(newTodoList)
 }
 
 // Update a task
-async function updateTodo(id, newTask) {
-    // Search
-    let getTodoByIDResult = await getTodoByID(id)
-    if (getTodoByIDResult.error) return getTodoByIDResult
-
-    // Update
-    let existingTask = getTodoByIDResult.task
-    let { task, status } = newTask
-    newTask = {
-        id,
-        task: task || existingTask.task,
-        status: status || existingTask.status
-    }
-    let updatedTodoList = await updateTodoData(newTask)
-    if (!updatedTodoList) return ({ error: "Cannot Update Data." }, { status: 500 })
-    return { updatedTodoList }
+async function updateTask(req, res) {
+    // Validate Request
+    // if (!req.body.task || !req.body.status) return res.status(400).send({ error: "Invalid Request." })
+    const { tlid, tdid } = req.params
+    const { task, status } = req.body
+    let modifiedTodoList = await todoModel.modifyTodoData(tlid, tdid, task, status)
+    if (!modifiedTodoList) return res.status(400).send({ error: "Cannot update Task. List does not exist." })
+    return res.status(200).send(modifiedTodoList)
 }
 
 // Delete a task by ID
@@ -115,5 +107,5 @@ async function removeTodoByStatus(status) {
 module.exports = {
     getTodoLists, getTodoListByID, getTaskByID,
     addTodoList, addTask,
-    updateTodo, removeTodo, removeTodoByStatus
+    updateTask, removeTodo, removeTodoByStatus
 }

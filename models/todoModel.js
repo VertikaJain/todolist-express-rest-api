@@ -53,10 +53,17 @@ function addTodoData(tlid, newTask) {
 }
 
 // Update task based on given ID
-function updateTodoData(newTask) {
+function modifyTodoData(tlid, tdid, task, status) {
     return new Promise((resolve, reject) => {
-        let index = todoLists.findIndex(t => t.id == newTask.id)
-        todoLists[index] = newTask
+        // Search
+        if (!todoLists[tlid]) resolve() //if todolist does not exist
+        let index = todoLists[tlid].findIndex(t => t.id == tdid)
+        if (index == -1) resolve() //if task does not exist in the todolist
+        // Update task
+        task = task || todoLists[tlid][index].task
+        status = status || todoLists[tlid][index].status
+        let newTask = { id: tdid, task, status }
+        todoLists[tlid][index] = newTask
         writeToFile(todoLists)
         resolve(todoLists)
     })
@@ -88,5 +95,6 @@ function writeToFile(todoList) {
 module.exports = {
     getTodoListData, getTodoListByIdData, getTaskByIdData,
     addTodoListData, addTodoData,
-    updateTodoData, removeTodoData, removeTodoByStatusData
+    modifyTodoData,
+    removeTodoData, removeTodoByStatusData
 }

@@ -30,6 +30,11 @@ app.post('/lists/:tlid', (req, res) => {
     todoController.addTask(req, res)
 })
 
+// Update Tasks by ID
+app.put("/lists/:tlid/todos/:tdid", (req, res) => {
+    todoController.updateTask(req, res)
+})
+
 /*
 // Update Tasks by ID
 app.put("/todos/:id", async (req, res) => {
