@@ -72,40 +72,39 @@ async function addTask(req, res) {
 // Update a task
 async function updateTask(req, res) {
     // Validate Request
-    // if (!req.body.task || !req.body.status) return res.status(400).send({ error: "Invalid Request." })
+    if (!req.body.task && !req.body.status) return res.status(400).send({ error: "Invalid Request." })
     const { tlid, tdid } = req.params
     const { task, status } = req.body
+    // Modify
     let modifiedTodoList = await todoModel.modifyTodoData(tlid, tdid, task, status)
     if (!modifiedTodoList) return res.status(400).send({ error: "Cannot update Task. List does not exist." })
     return res.status(200).send(modifiedTodoList)
 }
 
-// Delete a task by ID
-async function removeTodo(id) {
-    // Search
-    let getTodoByIDResult = await getTodoByID(id)
-    if (getTodoByIDResult.error) return getTodoByIDResult
-
-    // Delete
-    let todoList = await removeTodoData(id)
-    if (!todoList) return ({ error: "Cannot Remove Data." }, { status: 500 })
-    return { todoList }
+// Remove Todo List
+async function removeTodoList(req, res) {
+    let todoList = await todoModel.removeTodoListData(req.params.tlid)
+    if (!todoList) return res.status(400).send({ error: "Cannot remove List. List does not exist." })
+    return res.status(200).send(todoList)
 }
 
-// Delete a task by Status
-async function removeTodoByStatus(status) {
-    // Search
-    let getTodoByIDResult = await getTodoByStatus(status)
-    if (getTodoByIDResult.error) return getTodoByIDResult
+// Remove a task by ID
+async function removeTaskById(req, res) {
+    let todoList = await todoModel.removeTaskByIdData(req.params.tlid, req.params.tdid)
+    if (!todoList) return res.status(400).send({ error: "Cannot remove Task. List does not exist." })
+    return res.status(200).send(todoList)
+}
 
-    // Delete
-    let todoList = await removeTodoByStatusData(status)
-    if (!todoList) return ({ error: "Cannot Remove Data." }, { status: 500 })
-    return { todoList }
+// Remove a task by Status
+async function removeTaskByStatus(req, res) {
+    let todoList = await todoModel.removeStatusByIdData(req.params.tlid, req.query.status)
+    if (!todoList) return res.status(400).send({ error: "Cannot remove Task. List does not exist." })
+    return res.status(200).send(todoList)
 }
 
 module.exports = {
     getTodoLists, getTodoListByID, getTaskByID,
     addTodoList, addTask,
-    updateTask, removeTodo, removeTodoByStatus
+    updateTask,
+    removeTodoList, removeTaskById, removeTaskByStatus
 }

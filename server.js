@@ -35,39 +35,19 @@ app.put("/lists/:tlid/todos/:tdid", (req, res) => {
     todoController.updateTask(req, res)
 })
 
-/*
-// Update Tasks by ID
-app.put("/todos/:id", async (req, res) => {
-    // Validate Request
-    if (!req.body.task || !req.body.status)
-        return res.status(400).send({ error: "Invalid request" })
-    // Return result -> data or error 
-    let updatedTodoResult = await updateTodo(req.params.id, req.body)
-    if (updatedTodoResult.error && updatedTodoResult.status == 500)
-        return res.status(500).send(updatedTodoResult)
-    if (updatedTodoResult.error)
-        return res.status(404).send(updatedTodoResult)
-    res.status(200).send(updatedTodoResult)
+// Delete Todo List
+app.delete("/lists/:tlid", (req, res) => {
+    todoController.removeTodoList(req, res)
 })
 
 // Delete Tasks by ID
-app.delete("/todos/:id", async (req, res) => {
-    let removeTodoResult = await removeTodo(req.params.id)
-    if (removeTodoResult.error && removeTodoResult.status == 500)
-        return res.status(500).send(removeTodoResult)
-    if (removeTodoResult.error)
-        return res.status(404).send(removeTodoResult)
-    res.send(removeTodoResult)
+app.delete("/lists/:tlid/todos/:tdid", (req, res) => {
+    todoController.removeTaskById(req, res)
 })
 
 // Delete Tasks by Status
-app.delete("/todos", async (req, res) => {
-    let removeTodoResult = await removeTodoByStatus(req.query.status)
-    if (removeTodoResult.error && removeTodoResult.status == 500)
-        return res.status(500).send(removeTodoResult)
-    if (removeTodoResult.error)
-        return res.status(404).send(removeTodoResult)
-    res.send(removeTodoResult)
-}) */
+app.delete("/lists/:tlid", (req, res) => {
+    todoController.removeTaskByStatus(req, res)
+})
 
 app.listen(PORT, () => console.log(`Server Connected to ${PORT}`))
