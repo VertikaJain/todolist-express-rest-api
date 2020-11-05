@@ -3,35 +3,23 @@ const { v4: uuidv4 } = require("uuid");
 
 // GET all Todo Lists
 async function getTodoLists(req, res) {
-    let todoLists = await todoModel.getTodoListData()
-    if (!todoLists) return res.status(404).send({ error: "Data Not Found" })
-
-    // GET data by Status
-    if (req.query.status) {
-        let dataByStatus = []
-        for (const values of Object.values(todoLists)) {
-            let data = values.filter(v => v.status == req.query.status)
-            if (data.length > 0) {
-                for (let d of data) dataByStatus.push(d)
-            }
-        }
-        if (dataByStatus.length < 1) return res.status(404).send({ error: "Data Not Found" })
-        return res.status(200).send(dataByStatus)
+    try {
+        let todoLists = await todoModel.getTodoListData(req.query.status)
+        return res.status(200).send(todoLists)
+    } catch (error) {
+        return res.status(404).send({ error: "Data Not Found" })
     }
-
-    return res.status(200).send(todoLists)
 }
 
 // GET Todo List by ID
 async function getTodoListByID(req, res) {
-    let todoList = await todoModel.getTodoListByIdData(req.params.tlid)
-    if (!todoList) return res.status(404).send({ error: "Data Not Found" })
-    // GET data by Status
-    if (req.query.status) {
-        todoList = todoList.filter(t => t.status == req.query.status)
+    try {
+        let todoList = await todoModel.getTodoListByIdData(req.params.tlid, req.query.status)
+        return res.status(200).send(todoList)
+    } catch (error) {
+        return res.status(404).send({ error: "Data Not Found" })
+
     }
-    if (todoList.length < 1) return res.status(404).send({ error: "Data Not Found" })
-    return res.status(200).send(todoList)
 }
 
 // GET Task by ID

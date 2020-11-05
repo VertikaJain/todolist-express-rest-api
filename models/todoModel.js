@@ -3,14 +3,35 @@ const fs = require("fs");
 const { v4: uuidv4 } = require("uuid");
 
 // GET all Todo Lists
-function getTodoListData() {
-    return new Promise((resolve, reject) => resolve(todoLists))
+function getTodoListData(status) {
+    return new Promise((resolve, reject) => {
+        if (!todoLists) reject(error)
+
+        // GET data by Status
+        if (status) {
+            let dataByStatus = []
+            for (const values of Object.values(todoLists)) {
+                let data = values.filter(v => v.status == status)
+                if (data.length > 0) {
+                    for (let d of data) dataByStatus.push(d)
+                }
+            }
+            if (dataByStatus.length < 1) reject(error)
+            resolve(dataByStatus)
+        }
+        resolve(todoLists)
+    })
 }
 
 // GET Todo List by ID
-function getTodoListByIdData(tlid) {
+function getTodoListByIdData(tlid, status) {
     return new Promise((resolve, reject) => {
-        if (!todoLists[tlid]) resolve()
+        if (!todoLists[tlid]) reject(error)
+        if (status) {
+            let todoList = todoLists[tlid].filter(t => t.status == status)
+            if (todoList.length < 1) reject(error)
+            resolve(todoList)
+        }
         resolve(todoLists[tlid])
     })
 }
