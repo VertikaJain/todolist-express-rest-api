@@ -1,12 +1,19 @@
-let todoLists = require("../todolist.json")
+// let todoLists = require("../todolist.json")
 const fs = require("fs");
 const { v4: uuidv4 } = require("uuid");
+
+// Read file
+var todoLists = fs.readFileSync("todolist.json")
+try {
+    todoLists = JSON.parse(todoLists)
+} catch (error) {
+    todoLists = ""
+}
 
 // GET all Todo Lists
 function getTodoListData(status) {
     return new Promise((resolve, reject) => {
-        if (!todoLists) reject(error)
-
+        if (!todoLists) reject("Todo Lists do not exist.")
         // GET data by Status
         if (status) {
             let dataByStatus = []
@@ -16,8 +23,8 @@ function getTodoListData(status) {
                     for (let d of data) dataByStatus.push(d)
                 }
             }
-            if (dataByStatus.length < 1) reject(error)
-            resolve(dataByStatus)
+            if (dataByStatus.length < 1) reject("Data does not exist with the given Status.")
+            return resolve(dataByStatus)
         }
         resolve(todoLists)
     })
@@ -26,10 +33,11 @@ function getTodoListData(status) {
 // GET Todo List by ID
 function getTodoListByIdData(tlid, status) {
     return new Promise((resolve, reject) => {
-        if (!todoLists[tlid]) reject(error)
+        if (!todoLists) reject("Todo Lists do not exist.")
+        if (!todoLists[tlid]) reject("Todo List does not exist.")
         if (status) {
             let todoList = todoLists[tlid].filter(t => t.status == status)
-            if (todoList.length < 1) reject(error)
+            if (todoList.length < 1) reject("Data does not exist with the given Status.")
             resolve(todoList)
         }
         resolve(todoLists[tlid])
@@ -39,7 +47,8 @@ function getTodoListByIdData(tlid, status) {
 // GET Task by ID
 function getTaskByIdData(tlid, tdid, status) {
     return new Promise((resolve, reject) => {
-        if (!todoLists[tlid]) resolve()
+        if (!todoLists) reject("Todo Lists do not exist.")
+        if (!todoLists[tlid]) reject("Todo List does not exist.")
         let taskFound = ""
         for (let task of todoLists[tlid]) {
             if (status) {
@@ -49,7 +58,7 @@ function getTaskByIdData(tlid, tdid, status) {
             else if (task.id == tdid)
                 taskFound = { ...task }
         }
-        if (!taskFound) resolve()
+        if (!taskFound) reject("Task not Found.")
         resolve(taskFound)
     })
 }
@@ -57,6 +66,7 @@ function getTaskByIdData(tlid, tdid, status) {
 // Add new Todo List
 function addTodoListData(newTodoList) {
     return new Promise((resolve, reject) => {
+        if (!todoLists) todoLists = {} // Create new list in case it is empty
         const id = uuidv4()
         todoLists[id] = newTodoList
         writeToFile(todoLists)
@@ -66,7 +76,10 @@ function addTodoListData(newTodoList) {
 // Add new Task to the specified todolist
 function addTodoData(tlid, newTask) {
     return new Promise((resolve, reject) => {
-        if (!todoLists[tlid]) resolve()
+        if (!todoLists) reject("Todo Lists do not exist.")
+        if (!todoLists[tlid]) reject("Todo List does not exist.")
+        let index = todoLists[tlid].findIndex(t => t.task == newTask.task) //if task already exists
+        if (index != -1) reject("Task already exists in todolist.")
         todoLists[tlid].push(newTask)
         writeToFile(todoLists)
         resolve(todoLists)
@@ -77,9 +90,10 @@ function addTodoData(tlid, newTask) {
 function modifyTodoData(tlid, tdid, task, status) {
     return new Promise((resolve, reject) => {
         // Search
-        if (!todoLists[tlid]) resolve() //if todolist does not exist
+        if (!todoLists) reject(error)
+        if (!todoLists[tlid]) reject(error) //if todolist does not exist
         let index = todoLists[tlid].findIndex(t => t.id == tdid)
-        if (index == -1) resolve() //if task does not exist in the todolist
+        if (index == -1) reject(error) //if task does not exist in the todolist
         // Update task
         task = task || todoLists[tlid][index].task
         status = status || todoLists[tlid][index].status
