@@ -45,9 +45,4 @@ app.delete("/lists/:tlid/todos/:tdid", (req, res) => {
     todoController.removeTaskById(req, res)
 })
 
-// Delete Tasks by Status
-app.delete("/lists/:tlid", (req, res) => {
-    todoController.removeTaskByStatus(req, res)
-})
-
 app.listen(PORT, () => console.log(`Server Connected to ${PORT}`))

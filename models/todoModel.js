@@ -90,10 +90,10 @@ function addTodoData(tlid, newTask) {
 function modifyTodoData(tlid, tdid, task, status) {
     return new Promise((resolve, reject) => {
         // Search
-        if (!todoLists) reject(error)
-        if (!todoLists[tlid]) reject(error) //if todolist does not exist
+        if (!todoLists) reject("Todo Lists do not exist.")
+        if (!todoLists[tlid]) reject("Todo List does not exist.")
         let index = todoLists[tlid].findIndex(t => t.id == tdid)
-        if (index == -1) reject(error) //if task does not exist in the todolist
+        if (index == -1) reject("Task does not exist.") //if task does not exist in the todolist
         // Update task
         task = task || todoLists[tlid][index].task
         status = status || todoLists[tlid][index].status
@@ -105,10 +105,17 @@ function modifyTodoData(tlid, tdid, task, status) {
 }
 
 // Remove Todo List
-function removeTodoListData(tlid) {
+function removeTodoListData(tlid, status) {
     return new Promise((resolve, reject) => {
         // Search
-        if (!todoLists[tlid]) resolve() //if todolist does not exist
+        if (!todoLists) reject("Todo Lists do not exist.")
+        if (!todoLists[tlid]) reject("Todo List does not exist.")
+        // Check for Delete by Status
+        if (status) {
+             todoLists[tlid] = todoLists[tlid].filter(t => t.status != status)
+            writeToFile(todoLists)
+            return resolve(todoLists)
+        }
         // Delete
         delete todoLists[tlid]
         writeToFile(todoLists)
@@ -120,23 +127,10 @@ function removeTodoListData(tlid) {
 function removeTaskByIdData(tlid, tdid) {
     return new Promise((resolve, reject) => {
         // Search
-        if (!todoLists[tlid]) resolve() //if todolist does not exist
+        if (!todoLists) reject("Todo Lists do not exist.")
+        if (!todoLists[tlid]) reject("Todo List does not exist.")
         let index = todoLists[tlid].findIndex(t => t.id == tdid)
-        if (index == -1) resolve() //if task does not exist in the todolist
-        // Delete
-        todoLists[tlid].splice(index, 1)
-        writeToFile(todoLists)
-        resolve(todoLists)
-    })
-}
-
-// Remove task based on given Status
-function removeStatusByIdData(tlid, status) {
-    return new Promise((resolve, reject) => {
-        // Search
-        if (!todoLists[tlid]) resolve() //if todolist does not exist
-        let index = todoLists[tlid].findIndex(t => (t.status == status))
-        if (index == -1) resolve() //if task does not exist in the todolist
+        if (index == -1) reject("Task does not exist.")
         // Delete
         todoLists[tlid].splice(index, 1)
         writeToFile(todoLists)
@@ -153,5 +147,5 @@ module.exports = {
     getTodoListData, getTodoListByIdData, getTaskByIdData,
     addTodoListData, addTodoData,
     modifyTodoData,
-    removeTodoListData, removeTaskByIdData, removeStatusByIdData
+    removeTodoListData, removeTaskByIdData
 }
