@@ -1,10 +1,12 @@
 const todoModel = require("../models/todoModel")
 const { v4: uuidv4 } = require("uuid");
+const verifyUser = require("../users")
 
 // GET all Todo Lists
 async function getTodoLists(req, res) {
     try {
         let todoLists = await todoModel.getTodoListData(req.query.status)
+        await verifyUser(req.user)
         return res.status(200).send(todoLists)
     } catch (error) {
         return res.status(404).send({ error })
