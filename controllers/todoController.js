@@ -16,7 +16,9 @@ async function getTodoLists(req, res) {
 // GET Todo List by ID
 async function getTodoListByID(req, res) {
     try {
-        let todoList = await todoModel.getTodoListByIdData(req.params.tlid, req.query.status)
+        if (req.query.page <= 0 || req.query.limit <= 0 || (req.query.page > req.query.limit))
+            return res.status(400).send({ error: "Invalid Request." })
+        let todoList = await todoModel.getTodoListByIdData(req.params.tlid, req.query.status, req.query.page, req.query.limit)
         await verifyUser(req.user)
         return res.status(200).send(todoList)
     } catch (error) {

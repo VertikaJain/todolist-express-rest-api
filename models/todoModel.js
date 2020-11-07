@@ -31,10 +31,26 @@ function getTodoListData(status) {
 }
 
 // GET Todo List by ID
-function getTodoListByIdData(tlid, status) {
+function getTodoListByIdData(tlid, status, page, limit) {
     return new Promise((resolve, reject) => {
         if (!todoLists) reject("Todo Lists do not exist.")
         if (!todoLists[tlid]) reject("Todo List does not exist.")
+        // Implementing Pagination for Tasks
+        if (page && limit) {
+            page = parseInt(page)
+            limit = parseInt(limit)
+            if (limit > todoLists[tlid].length) return resolve(todoLists[tlid])
+            const startIndex = limit * (page - 1)
+            const endIndex = limit * page
+            let result = {}
+            result.tasks = todoLists[tlid].slice(startIndex, endIndex)
+            if (endIndex < todoLists[tlid].length)
+                result.next = { page: page + 1, limit }
+            if (startIndex > 0)
+                result.previous = { page: page - 1, limit }
+            return resolve(result)
+        }
+
         if (status) {
             let todoList = todoLists[tlid].filter(t => t.status == status)
             if (todoList.length < 1) reject("Data does not exist with the given Status.")
@@ -112,7 +128,7 @@ function removeTodoListData(tlid, status) {
         if (!todoLists[tlid]) reject("Todo List does not exist.")
         // Check for Delete by Status
         if (status) {
-             todoLists[tlid] = todoLists[tlid].filter(t => t.status != status)
+            todoLists[tlid] = todoLists[tlid].filter(t => t.status != status)
             writeToFile(todoLists)
             return resolve(todoLists)
         }
