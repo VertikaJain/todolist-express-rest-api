@@ -17,6 +17,7 @@ async function getTodoLists(req, res) {
 async function getTodoListByID(req, res) {
     try {
         let todoList = await todoModel.getTodoListByIdData(req.params.tlid, req.query.status)
+        await verifyUser(req.user)
         return res.status(200).send(todoList)
     } catch (error) {
         return res.status(404).send({ error })
@@ -28,6 +29,7 @@ async function getTodoListByID(req, res) {
 async function getTaskByID(req, res) {
     try {
         let task = await todoModel.getTaskByIdData(req.params.tlid, req.params.tdid, req.query.status)
+        await verifyUser(req.user)
         return res.status(200).send(task)
     } catch (error) {
         return res.status(404).send({ error })
@@ -50,6 +52,7 @@ async function addTodoList(req, res) {
     }
     try {
         let newTodoList = await todoModel.addTodoListData(tempList)
+        await verifyUser(req.user)
         return res.status(201).send(newTodoList)
     } catch (error) {
         return res.status(500).send({ error: "Cannot add Todo List." })
@@ -64,6 +67,7 @@ async function addTask(req, res) {
     let newTask = { id: uuidv4(), task: req.body.task, status: req.body.status }
     try {
         let newTodoList = await todoModel.addTodoData(req.params.tlid, newTask)
+        await verifyUser(req.user)
         return res.status(201).send(newTodoList)
     } catch (error) {
         return res.status(404).send({ error })
@@ -77,6 +81,7 @@ async function updateTask(req, res) {
     // Modify
     try {
         let modifiedTodoList = await todoModel.modifyTodoData(req.params.tlid, req.params.tdid, req.body.task, req.body.status)
+        await verifyUser(req.user)
         return res.status(200).send(modifiedTodoList)
     } catch (error) {
         return res.status(404).send({ error })
@@ -88,6 +93,7 @@ async function updateTask(req, res) {
 async function removeTodoList(req, res) {
     try {
         let todoList = await todoModel.removeTodoListData(req.params.tlid, req.query.status)
+        await verifyUser(req.user)
         return res.status(200).send(todoList)
     } catch (error) {
         return res.status(404).send({ error })
@@ -98,6 +104,7 @@ async function removeTodoList(req, res) {
 async function removeTaskById(req, res) {
     try {
         let todoList = await todoModel.removeTaskByIdData(req.params.tlid, req.params.tdid)
+        await verifyUser(req.user)
         return res.status(200).send(todoList)
     } catch (error) {
         return res.status(404).send({ error })
