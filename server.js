@@ -16,6 +16,12 @@ app.post("/users/login", (req, res) => {
     })
 })
 
+// Pagination Implementation
+app.get("/users", (req, res) => {
+    const getAllUsers = require("./controllers/userController")
+    getAllUsers(req, res)
+})
+
 // Routes
 const listsRouter = require("./routes")
 app.use("/lists", listsRouter)

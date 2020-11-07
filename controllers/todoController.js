@@ -1,6 +1,6 @@
 const todoModel = require("../models/todoModel")
 const { v4: uuidv4 } = require("uuid");
-const verifyUser = require("../users")
+const { verifyUser } = require("../models/userModel")
 
 // GET all Todo Lists
 async function getTodoLists(req, res) {
